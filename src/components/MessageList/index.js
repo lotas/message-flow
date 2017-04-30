@@ -31,7 +31,7 @@ const ItemMessage = (props) => (
         <span className='channel'>{props.msg.channel}</span>
         <span className='team'>{props.msg.channel}</span>
       </Item.Meta>
-      <Item.Description>{props.msg.description}</Item.Description>
+      <Item.Description>{props.msg.text}</Item.Description>
     </Item.Content>
   </Item>
 );
@@ -45,7 +45,7 @@ const FeedMessage = (props) => (
         {" posted on "}
         <Feed.Date>{formatMessageDate(props.msg)}</Feed.Date>
       </Feed.Summary>
-      <Feed.Extra text>{props.msg.description}</Feed.Extra>
+      <Feed.Extra text>{props.msg.text}</Feed.Extra>
     </Feed.Content>
   </Feed.Event>
 );

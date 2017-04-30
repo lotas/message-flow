@@ -10,6 +10,7 @@ const SLACK_EVENT_MESSAGE = 'message';
 const SLACK_VERIFICATION_TOKEN = process.env.SLACK_VERIFICATION_TOKEN;
 
 const Message = require('../models/Message');
+const Incoming = require('../models/Incoming');
 
 /* GET users listing. */
 router.post('/event', function(req, res, next) {
@@ -20,6 +21,11 @@ router.post('/event', function(req, res, next) {
     debug(`Slack verification token mismatch: ${token}`);
     return res.send(401);
   }
+
+  const incoming = new Incoming({
+    rawRequest: slackReq
+  });
+  incoming.save();
 
   const reqType = slackReq.type || '';
   debug(`Incoming msg type: ${reqType}`);

@@ -8,7 +8,8 @@ const messageSchema = mongoose.Schema({
   ts: String,
   username: String,
   text: String,
-  meta: Object
+  meta: Object,
+  attachments: [Object]
 });
 
 messageSchema.statics.newFromSlackRequest = function(slackReq) {
@@ -24,7 +25,8 @@ messageSchema.statics.newFromSlackRequest = function(slackReq) {
       text: slackReq.event.text,
       meta: {
         icons: slackReq.event.icons || {}
-      }
+      },
+      attachments: slackReq.event.attachments
     });
 }
 

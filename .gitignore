@@ -38,8 +38,6 @@ jspm_packages
 
 .env
 
-public/*
-
 
 # testing
 /coverage

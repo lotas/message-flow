@@ -7,8 +7,14 @@ const Incoming = require('../models/Incoming');
 
 router.get('/', function(req, res, next) {
   //@TODO authorise and filter by current team only
+
+  const limit = req.query.limit || 40;
+  const skip = req.query.skip || 0;
+
   Message.find({})
-    .sort({event_type: 'desc'})
+    .sort({event_time: -1})
+    .limit(limit)
+    .skip(skip)
     .exec((err, docs) => {
       if (err) {
         debug('Error querying', err);

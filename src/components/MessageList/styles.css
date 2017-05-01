@@ -7,3 +7,7 @@
   font-size: 12px;
   color: #888;
 }
+
+.ui.feed>.event>.content .extra.text.feed-longText {
+  max-width: 1900px;
+}

@@ -21,6 +21,12 @@ const extractIcon = (msg) => {
 }
 
 const formatMessageDate = (msg) => new Date(msg.event_time * 1000).toLocaleString();
+const formatMessageText = (txt) => {
+  return String(txt).replace(/<([^>]+)>/g, (match, p1) => {
+    const [url, linkName] = p1.split('|');
+    return `<a href="${url}">${linkName}</a>`;
+  });
+}
 
 const ItemMessage = (props) => (
   <Item key={props.msg._id}>
@@ -45,7 +51,9 @@ const FeedMessage = (props) => (
         {" posted on "}
         <Feed.Date>{formatMessageDate(props.msg)}</Feed.Date>
       </Feed.Summary>
-      <Feed.Extra text>{props.msg.text}</Feed.Extra>
+      <Feed.Extra text className="feed-longText">
+        <span dangerouslySetInnerHTML={{__html: formatMessageText(props.msg.text)}} />
+      </Feed.Extra>
     </Feed.Content>
   </Feed.Event>
 );
@@ -59,7 +67,7 @@ const MessageItemList = (props) => (
 
 const MessageList = (props) => (
   <Feed>
-    { props.messages.map(msg => <FeedMessage msg={msg} />) }
+    { props.messages.reverse().map(msg => <FeedMessage msg={msg} />) }
   </Feed>
 );
 

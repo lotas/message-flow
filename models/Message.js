@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema
 
-const messageSchema = mongoose.Schema({
+const messageSchema = Schema({
   team_id: String,
   api_app_id: String,
   event_time: Number,
@@ -12,7 +13,7 @@ const messageSchema = mongoose.Schema({
     icons: Object,
     event_id: String
   },
-  attachments: [Object]
+  attachments: Schema.Types.Mixed
 });
 
 messageSchema.statics.newFromSlackRequest = function(slackReq) {

@@ -5,16 +5,18 @@ const debug = require('debug')('app:messages');
 const Message = require('../models/Message');
 const Incoming = require('../models/Incoming');
 
+const DEFAULT_PAGE_SIZE = 40;
+
 router.get('/', function(req, res, next) {
   //@TODO authorise and filter by current team only
 
-  const limit = req.query.limit || 40;
-  const skip = req.query.skip || 0;
+  const limit = parseInt(req.query.limit, 10);
+  const skip = parseInt(req.query.skip, 10);
 
   Message.find({})
-    .sort({event_time: -1})
-    .limit(limit)
-    .skip(skip)
+    .sort({_id: -1})
+    .limit(limit || DEFAULT_PAGE_SIZE)
+    .skip(skip || 0)
     .exec((err, docs) => {
       if (err) {
         debug('Error querying', err);

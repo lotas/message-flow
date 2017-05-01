@@ -14,7 +14,7 @@ const Nav = () => (
           name='messages'
           as='div'
         >
-          <NavLink activeStyle={activeStyle} to="/messages">Messages</NavLink>
+          <NavLink activeStyle={activeStyle} to="/">Messages</NavLink>
         </Menu.Item>
 
         <Menu.Item

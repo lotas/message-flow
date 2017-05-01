@@ -21,10 +21,20 @@ const extractIcon = (msg) => {
 }
 
 const formatMessageDate = (msg) => new Date(msg.event_time * 1000).toLocaleString();
-const formatMessageText = (txt) => {
+const formatMessageText = (msg) => {
+  let txt = msg.text;
+  if (!txt && msg.attachments && msg.attachments.length) {
+    const att = msg.attachments[0];
+    txt = att.text || att.fallback;
+  }
+  if (!txt) {
+    console.debug('Odd message:', msg);
+    return '';
+  }
+
   return String(txt).replace(/<([^>]+)>/g, (match, p1) => {
     const [url, linkName] = p1.split('|');
-    return `<a href="${url}">${linkName}</a>`;
+    return `<a href="${url}">${linkName || url}</a>`;
   });
 }
 
@@ -52,7 +62,7 @@ const FeedMessage = (props) => (
         <Feed.Date>{formatMessageDate(props.msg)}</Feed.Date>
       </Feed.Summary>
       <Feed.Extra text className="feed-longText">
-        <span dangerouslySetInnerHTML={{__html: formatMessageText(props.msg.text)}} />
+        <span dangerouslySetInnerHTML={{__html: formatMessageText(props.msg)}} />
       </Feed.Extra>
     </Feed.Content>
   </Feed.Event>
@@ -67,7 +77,7 @@ const MessageItemList = (props) => (
 
 const MessageList = (props) => (
   <Feed>
-    { props.messages.reverse().map(msg => <FeedMessage msg={msg} />) }
+    { props.messages.map(msg => <FeedMessage msg={msg} />) }
   </Feed>
 );
 

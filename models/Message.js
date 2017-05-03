@@ -50,7 +50,7 @@ messageSchema.statics.supressChangedMessage = function(slackReq) {
     team_id: slackReq.team_id,
     api_app_id: slackReq.api_app_id,
     channel: event.channel || null,
-    ts: event.ts
+    ts: event.previous_message.ts || null
   }, {
     isChanged: true
   });

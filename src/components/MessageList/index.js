@@ -61,9 +61,12 @@ const FeedMessage = (props) => (
         {" posted on "}
         <Feed.Date>{formatMessageDate(props.msg)}</Feed.Date>
       </Feed.Summary>
-      <Feed.Extra text className="feed-longText">
+      <Feed.Extra text className="feed-longText" key="text">
         <span dangerouslySetInnerHTML={{__html: formatMessageText(props.msg)}} />
       </Feed.Extra>
+      {props.msg.attachments && <Feed.Extra images key="images">
+          {props.msg.attachments.map(att => <a href={att.image_url} key={att.id}><img src={att.image_url} /></a>)}
+        </Feed.Extra>}
     </Feed.Content>
   </Feed.Event>
 );

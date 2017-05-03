@@ -7,7 +7,9 @@
     "start-client": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint {src,models,routes}/**/*.js",
+    "lint:autofix": "eslint {src,models,routes}/**/*.js --fix"
   },
   "dependencies": {
     "body-parser": "~1.17.1",
@@ -29,6 +31,9 @@
     "serve-favicon": "~2.4.2"
   },
   "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-plugin-class-property": "^1.0.6",
+    "eslint-plugin-react": "^6.10.3",
     "react-scripts": "0.9.5"
   },
   "proxy": "http://localhost:3333"

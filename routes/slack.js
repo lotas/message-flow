@@ -6,6 +6,7 @@ const SLACK_REQ_URL_VERIFICATION = 'url_verification';
 const SLACK_REQ_EVENT_CALLBACK = 'event_callback';
 
 const SLACK_EVENT_MESSAGE = 'message';
+const SLACK_EVENT_SUBTYPE_MESSAGE_CHANGED = 'message_changed';
 
 const SLACK_VERIFICATION_TOKEN = process.env.SLACK_VERIFICATION_TOKEN;
 
@@ -13,7 +14,7 @@ const Message = require('../models/Message');
 const Incoming = require('../models/Incoming');
 
 /* GET users listing. */
-router.post('/event', function(req, res, next) {
+router.post('/event', function(req, res) {
   const slackReq = req.body;
 
   const token = slackReq.token;
@@ -36,6 +37,12 @@ router.post('/event', function(req, res, next) {
     const event = slackReq.event;
     switch (event.type) {
       case SLACK_EVENT_MESSAGE:
+
+        if (event.subtype == SLACK_EVENT_SUBTYPE_MESSAGE_CHANGED) {
+          // mark as isChanged previous one
+          Message.supressChangedMessage(slackReq);
+        }
+
         // @TODO private channels? avoid completely or save
         const message = Message.newFromSlackRequest(slackReq);
         message.save((err, record) => {

@@ -7,7 +7,7 @@ const Incoming = require('../models/Incoming');
 
 const DEFAULT_PAGE_SIZE = 40;
 
-router.get('/', function(req, res, next) {
+router.get('/', function(req, res) {
   //@TODO authorise and filter by current team only
 
   const limit = parseInt(req.query.limit, 10);
@@ -26,7 +26,7 @@ router.get('/', function(req, res, next) {
     });
 });
 
-router.get('/raw', function(req, res, next) {
+router.get('/raw', function(req, res) {
   Incoming.find({})
     .exec((err, incomingRequests) => {
       if (err) {
@@ -35,6 +35,6 @@ router.get('/raw', function(req, res, next) {
       }
       res.json(incomingRequests);
     });
-})
+});
 
 module.exports = router;

@@ -53,9 +53,7 @@ class Messages extends Component {
     return (
       <div>
         <Segment>
-          <Dimmer active={loading}>
-            <Loader>Loading</Loader>
-          </Dimmer>
+          <Loader active={loading}>Loading</Loader>
 
           <Container textAlign='right'>
             <Button

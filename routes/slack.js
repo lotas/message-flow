@@ -13,6 +13,13 @@ const SLACK_VERIFICATION_TOKEN = process.env.SLACK_VERIFICATION_TOKEN;
 const Message = require('../models/Message');
 const Incoming = require('../models/Incoming');
 
+const messageSaveCallback = (err, record) => {
+  if (err) {
+    return debug('Error saving entity', err);
+  }
+  debug(`Message saved: ${record._id}`);
+};
+
 /* GET users listing. */
 router.post('/event', function(req, res) {
   const slackReq = req.body;
@@ -38,19 +45,22 @@ router.post('/event', function(req, res) {
     switch (event.type) {
       case SLACK_EVENT_MESSAGE:
 
-        if (event.subtype == SLACK_EVENT_SUBTYPE_MESSAGE_CHANGED) {
-          // mark as isChanged previous one
-          Message.supressChangedMessage(slackReq);
-        }
-
         // @TODO private channels? avoid completely or save
         const message = Message.newFromSlackRequest(slackReq);
-        message.save((err, record) => {
-          if (err) {
-            return debug('Error saving entity', err);
-          }
-          debug(`Message saved: ${record._id}`);
-        });
+
+        if (event.subtype == SLACK_EVENT_SUBTYPE_MESSAGE_CHANGED) {
+          // mark as isChanged previous one
+          Message.supressChangedMessage(slackReq)
+            .exec((err) => {
+              if (err) {
+                return debug('Error updating changed message', err);
+              }
+              message.save(messageSaveCallback);
+            });
+        } else {
+          message.save(messageSaveCallback);
+        }
+
         break;
 
       default:

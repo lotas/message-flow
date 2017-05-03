@@ -1,4 +1,3 @@
-const debug = require('debug')('app:model:Message');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -47,18 +46,13 @@ messageSchema.statics.supressChangedMessage = function(slackReq) {
   const Message = this;
   const event = slackReq.event;
 
-  Message.findOneAndUpdate({
+  return Message.findOneAndUpdate({
     team_id: slackReq.team_id,
     api_app_id: slackReq.api_app_id,
     channel: event.channel || null,
     ts: event.ts
   }, {
     isChanged: true
-  }, (err) => {
-    if (err) {
-      return debug(err);
-    }
-    debug(`Updated isChanged on ${event.ts}`);
   });
 };
 

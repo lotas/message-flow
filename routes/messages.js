@@ -13,7 +13,9 @@ router.get('/', function(req, res) {
   const limit = parseInt(req.query.limit, 10);
   const skip = parseInt(req.query.skip, 10);
 
-  Message.find({})
+  Message.find({
+      isChanged: false
+    })
     .sort({_id: -1})
     .limit(limit || DEFAULT_PAGE_SIZE)
     .skip(skip || 0)

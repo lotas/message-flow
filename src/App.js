@@ -18,7 +18,7 @@ class App extends Component {
     return (
       <Router>
         <Container fluid className="App">
-          <Nav />
+          {/* <Nav /> */}
 
           <Route exact path="/" component={Messages} />
           <Route path="/messages" component={Messages} />

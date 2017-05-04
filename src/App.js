@@ -21,7 +21,6 @@ class App extends Component {
           {/* <Nav /> */}
 
           <Route exact path="/" component={Messages} />
-          <Route path="/messages" component={Messages} />
           <Route path="/about" component={About} />
         </Container>
       </Router>

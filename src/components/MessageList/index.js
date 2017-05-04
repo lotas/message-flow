@@ -17,10 +17,17 @@ const extractIcon = (msg) => {
   if (msg.meta && msg.meta.icons) {
     return Object.values(msg.meta.icons).pop();
   }
+  if (msg.attachments) {
+    return msg.attachments.map(att => att.service_icon || att.author_icon).pop();
+  }
   return null;
 }
 
-const formatMessageDate = (msg) => new Date(msg.event_time * 1000).toLocaleString();
+const extractUserName = (msg) => {
+  return (msg.attachments || []).map(att => att.author_name || att.service_name).pop() || msg.username;
+}
+
+const formatMessageDate = (msg) => new Date(msg.event_time).toLocaleString();
 const formatMessageText = (msg) => {
   let txt = msg.text;
   if (!txt && msg.attachments && msg.attachments.length) {
@@ -34,7 +41,7 @@ const formatMessageText = (msg) => {
 
   return String(txt).replace(/<([^>]+)>/g, (match, p1) => {
     const [url, linkName] = p1.split('|');
-    return `<a href="${url}">${linkName || url}</a>`;
+    return `<a target="_blank" href="${url}">${linkName || url}</a>`;
   });
 }
 
@@ -57,7 +64,7 @@ const FeedMessage = (props) => (
     <Feed.Label image={extractIcon(props.msg)} />
     <Feed.Content>
       <Feed.Summary>
-        <Feed.User>{props.msg.username}</Feed.User>
+        <Feed.User>{extractUserName(props.msg)}</Feed.User>
         {" posted on "}
         <Feed.Date>{formatMessageDate(props.msg)}</Feed.Date>
       </Feed.Summary>
@@ -65,7 +72,8 @@ const FeedMessage = (props) => (
         <span dangerouslySetInnerHTML={{__html: formatMessageText(props.msg)}} />
       </Feed.Extra>
       {props.msg.attachments && <Feed.Extra images key="images">
-          {props.msg.attachments.map(att => <a href={att.image_url} key={att.id}><img src={att.image_url} /></a>)}
+          {props.msg.attachments.map((att,i) =>
+            <a target="_blank" href={att.image_url || att.thumb_url} key={i}><img src={att.image_url || att.thumb_url} /></a>)}
         </Feed.Extra>}
     </Feed.Content>
   </Feed.Event>
@@ -80,7 +88,7 @@ const MessageItemList = (props) => (
 
 const MessageList = (props) => (
   <Feed>
-    { props.messages.map(msg => <FeedMessage msg={msg} />) }
+    { props.messages.map(msg => <FeedMessage msg={msg} key={msg.ts} />) }
   </Feed>
 );
 

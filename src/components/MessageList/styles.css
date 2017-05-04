@@ -11,3 +11,7 @@
 .ui.feed>.event>.content .extra.text.feed-longText {
   max-width: 1900px;
 }
+
+.event {
+  border-bottom: 1px dotted #ccc;
+}

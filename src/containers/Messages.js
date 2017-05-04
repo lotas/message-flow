@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { Dimmer, Loader,  Segment, Container, Button } from 'semantic-ui-react'
+import { Dimmer, Loader,  Segment, Container, Button, Rail } from 'semantic-ui-react'
 
 import MessageList from '../components/MessageList';
-
+import Stats from '../components/Stats';
 
 const DEFAULT_PAGE_SIZE = 50;
 
@@ -21,7 +21,8 @@ class Messages extends Component {
     loading: true,
     messages: [],
     error: false,
-    skip: 0
+    skip: 0,
+    stats: {}
   }
 
   loadMessages(limit=DEFAULT_PAGE_SIZE, skip=0) {
@@ -43,8 +44,21 @@ class Messages extends Component {
       }))
   }
 
+  loadStats() {
+    fetch(`/messages/stats`)
+      .then(res => res.json())
+      .then(stats => this.setState({
+        stats: stats
+      }))
+      .catch(err => this.setState({
+        loading: false,
+        error: err
+      }))
+  }
+
   componentWillMount() {
     this.loadMessages()
+    this.loadStats()
   }
 
   render() {
@@ -55,22 +69,23 @@ class Messages extends Component {
         <Segment>
           <Loader active={loading}>Loading</Loader>
 
-          <Container textAlign='right'>
+          <Container style={{clear: 'both'}}>
             <Button
               content='Reload'
               icon='refresh'
               color='blue'
               basic
+              style={{float: 'right'}}
               onClick={() => this.loadMessages()}
-             />
+            />
+            <Stats {...this.state.stats} />
           </Container>
 
-          { loading && <MessageList messages={[emptyMessage]} /> }
 
           { messages.length > 0 && <MessageList messages={messages} /> }
 
           { messages.length > 0 &&
-          <Container textAlign='center'>
+          <Segment textAlign='center'>
             <Button
               content='Load more'
               icon='arrow down'
@@ -78,7 +93,7 @@ class Messages extends Component {
               basic
               onClick={() => this.loadMessages(DEFAULT_PAGE_SIZE, this.state.skip + DEFAULT_PAGE_SIZE)}
              />
-          </Container>
+          </Segment>
         }
         </Segment>
       </div>

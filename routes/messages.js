@@ -39,4 +39,22 @@ router.get('/raw', function(req, res) {
     });
 });
 
+router.get('/stats', async function(req, res) {
+  const totalMessages = await Message.count();
+
+  let today = new Date();
+  today.setHours(0,0,0,0);
+
+  const totalToday = await Message.count({
+    event_time: {
+      $gt: today
+    }
+  });
+
+  res.json({
+    total: totalMessages,
+    today: totalToday
+  });
+});
+
 module.exports = router;

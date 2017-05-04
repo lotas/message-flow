@@ -4,9 +4,9 @@ const Schema = mongoose.Schema;
 const messageSchema = Schema({
   team_id: String,
   api_app_id: String,
-  event_time: Number,
+  event_time: Date,
   channel: String,
-  ts: String,
+  ts: {type: String, index: true},
   username: String,
   text: String,
   meta: {
@@ -25,11 +25,12 @@ const messageSchema = Schema({
 messageSchema.statics.newFromSlackRequest = function(slackReq) {
   const Message = this;
   const event = slackReq.event;
+  const attachments = event.message ? event.message.attachments : event.attachments;
 
   return new Message({
     team_id: slackReq.team_id,
     api_app_id: slackReq.api_app_id,
-    event_time: slackReq.event_time,
+    event_time: slackReq.event_time * 1000,
     channel: event.channel || null,
     ts: event.ts || null,
     username: event.message ? event.message.username : (event.user || event.username),
@@ -38,7 +39,7 @@ messageSchema.statics.newFromSlackRequest = function(slackReq) {
       icons: event.icons || {},
       event_id: slackReq.event_id
     },
-    attachments: event.message ? event.message.attachments : event.attachments
+    attachments: attachments
   });
 };
 

@@ -1,17 +1,8 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Card, Item, Feed } from 'semantic-ui-react';
 
 import './styles.css';
-
-const CardMessage = (props) => (
-  <Card>
-    <Card.Content header={props.message.username} />
-    <Card.Content description={props.message.text} />
-    <Card.Content extra>
-      { new Date(props.message.ts).toLocaleString() }
-    </Card.Content>
-  </Card>
-);
 
 const extractIcon = (msg) => {
   if (msg.meta && msg.meta.icons) {
@@ -45,20 +36,6 @@ const formatMessageText = (msg) => {
   });
 }
 
-const ItemMessage = (props) => (
-  <Item key={props.msg._id}>
-    <Item.Image size='tiny' src={extractIcon(props.msg)} />
-    <Item.Content>
-      <Item.Header>{props.msg.username}</Item.Header>
-      <Item.Meta>
-        <span className='channel'>{props.msg.channel}</span>
-        <span className='team'>{props.msg.channel}</span>
-      </Item.Meta>
-      <Item.Description>{props.msg.text}</Item.Description>
-    </Item.Content>
-  </Item>
-);
-
 const FeedMessage = (props) => (
   <Feed.Event key={props.msg._id}>
     <Feed.Label image={extractIcon(props.msg)} />
@@ -79,12 +56,9 @@ const FeedMessage = (props) => (
   </Feed.Event>
 );
 
-
-const MessageItemList = (props) => (
-  <Item.Group>
-    { props.messages.map(msg => <ItemMessage msg={msg} />) }
-  </Item.Group>
-);
+FeedMessage.propTypes = {
+  msg: PropTypes.object
+};
 
 const MessageList = (props) => (
   <Feed>
@@ -92,5 +66,8 @@ const MessageList = (props) => (
   </Feed>
 );
 
+MessageList.propTypes = {
+  messages: PropTypes.array
+};
 
 export default MessageList;

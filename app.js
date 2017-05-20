@@ -5,11 +5,11 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const lessMiddleware = require('less-middleware');
-const cors = require('cors');
 
 const index = require('./routes/index');
 const slack = require('./routes/slack');
 const messages = require('./routes/messages');
+const auth = require('./routes/auth');
 
 const app = express();
 
@@ -26,9 +26,13 @@ app.use(cookieParser());
 app.use(lessMiddleware(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'build')));
 
+const corsMiddleware = require('./routes/middleware/cors');
+const authMiddleware = require('./routes/middleware/auth');
+
 app.use('/', index);
 app.use('/slack', slack);
-app.use('/messages', cors(), messages);
+app.use('/messages', corsMiddleware, authMiddleware, messages);
+app.use('/auth', corsMiddleware, authMiddleware, auth);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

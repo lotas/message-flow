@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -6,8 +7,23 @@ const slackAuthSchema = Schema({
   scope: String,
   user: Object,
   team: Object,
-  date: Date
+  date: Date,
+  session_token: String
 });
+
+slackAuthSchema.methods.generateSessionToken = function() {
+  return new Promise((resolve, reject) => {
+    crypto.randomBytes(48, (err, buffer) => {
+      if (err) {
+        return reject(err);
+      }
+
+      this.session_token = buffer.toString('hex');
+
+      resolve();
+    });
+  });
+};
 
 slackAuthSchema.statics.newFromSlackResponse = function(slackRes) {
   const SlackAuth = this;

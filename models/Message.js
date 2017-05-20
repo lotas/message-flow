@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const messageSchema = Schema({
-  team_id: String,
+  team_id: {type: String, index: true},
   api_app_id: String,
   event_time: Date,
   channel: String,

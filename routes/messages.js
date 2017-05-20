@@ -8,13 +8,14 @@ const Incoming = require('../models/Incoming');
 const DEFAULT_PAGE_SIZE = 40;
 
 router.get('/', function(req, res) {
-  //@TODO authorise and filter by current team only
+  const teamId = req.user.team.id;
 
   const limit = parseInt(req.query.limit, 10);
   const skip = parseInt(req.query.skip, 10);
 
   Message.find({
-      isChanged: false
+      isChanged: false,
+      team_id: teamId
     })
     .sort({_id: -1})
     .limit(limit || DEFAULT_PAGE_SIZE)
@@ -40,12 +41,16 @@ router.get('/raw', function(req, res) {
 });
 
 router.get('/stats', async function(req, res) {
-  const totalMessages = await Message.count();
+  const teamId = req.user.team.id;
+  const totalMessages = await Message.count({
+    team_id: teamId
+  });
 
   let today = new Date();
   today.setHours(0,0,0,0);
 
   const totalToday = await Message.count({
+    team_id: teamId,
     event_time: {
       $gt: today
     }

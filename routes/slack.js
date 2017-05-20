@@ -4,6 +4,9 @@ const request = require('request');
 
 const router = express.Router();
 
+const FRONTEND_URL = process.env.FRONTEND_URL;
+const API_URL = process.env.REACT_APP_API_URL;
+
 const SLACK_REQ_URL_VERIFICATION = 'url_verification';
 const SLACK_REQ_EVENT_CALLBACK = 'event_callback';
 
@@ -83,7 +86,7 @@ router.get('/auth', function(req, res) {
     let state = req.query.state;
 
     if (!code) {
-        return res.redirect('http://mf.uelco.co/');
+        return res.redirect(`${FRONTEND_URL}`);
     }
 
     debug(`New AddSlack oauth request code=${code}`);
@@ -92,24 +95,25 @@ router.get('/auth', function(req, res) {
         .then(teamInfo => {
             console.log(teamInfo);
             if (teamInfo.ok === false || !!teamInfo.error) {
-                return res.redirect(`http://mf.uelco.co/slack/?error=${teamInfo.error}`);
+                return res.redirect(`${FRONTEND_URL}login/?slack_error=${teamInfo.error}`);
             }
 
             const slackAuth = SlackAuth.newFromSlackResponse(teamInfo);
-            slackAuth.save();
-
-            return res.redirect(`http://localhost:3334/login?t=${JSON.stringify(teamInfo.access_token)}`);
-
-            // ensureTeamExists(app, teamInfo)
-            //     .then(team => {
-            //         debug('Team saved or updated', team.teamId);
-            //         res.redirect('https://loliful.io/slack-installed/');
-            //     })
-            //     .catch(err => {
-            //         res.sendStatus(500);
-            //     });
+            slackAuth.generateSessionToken()
+              .then(() => {
+                return slackAuth.save();
+              })
+              .then(() => {
+                res.cookie('mfAuth', slackAuth.session_token, {httpOnly: true});
+                res.redirect(`${FRONTEND_URL}`);
+              })
+              .catch(err => {
+                console.error(err);
+                res.send(500);
+              });
         })
         .catch(err => {
+            console.error(err);
             res.sendStatus(500);
         });
 
@@ -121,7 +125,7 @@ function performSlackAuth(code) {
     authUrl += 'client_id=' + SLACK_CLIENT_ID;
     authUrl += '&client_secret=' + SLACK_CLIENT_SECRET;
     authUrl += '&code=' + code;
-    authUrl += '&redirect_uri=http://localhost:3333/slack/auth';
+    authUrl += `&redirect_uri=${API_URL}/slack/auth`;
 
     return new Promise((resolve, reject) => {
         request.get(authUrl, (error, response, body) => {
@@ -137,32 +141,5 @@ function performSlackAuth(code) {
         });
     });
 }
-
-// function getSlackUserInfo(app, teamId, userId) {
-//     return new Promise((resolve, reject) => {
-//         app.models.slackTeam.findOne({
-//                 where: { teamId: teamId }
-//             }, (err, team) => {
-//                 if (err) {
-//                     debug('Error finding team: ', err);
-//                     return reject(err);
-//                 }
-
-//                 const url = `https://slack.com/api/users.profile.get?token=${team.token}&user=${userId}`;
-//                 request.get(url, (error, response, body) => {
-//                     if (error) {
-//                         debug('Error getting user profile', error);
-//                         return reject(error);
-//                     }
-//                     const _body = JSON.parse(body);
-//                     debug('slack users.profile.get', body);
-
-//                     console.log(url, _body);
-//                     resolve(_body);
-//                 });
-//             }
-//         );
-//     });
-// }
 
 module.exports = router;

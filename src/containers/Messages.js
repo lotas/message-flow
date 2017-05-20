@@ -3,6 +3,7 @@ import { Dimmer, Loader,  Segment, Container, Button, Rail } from 'semantic-ui-r
 
 import MessageList from '../components/MessageList';
 import Stats from '../components/Stats';
+import {getMessages, getStats} from '../api';
 
 const DEFAULT_PAGE_SIZE = 50;
 
@@ -32,8 +33,7 @@ class Messages extends Component {
       skip: skip
     });
 
-    fetch(`/messages/?limit=${limit}&skip=${skip}`)
-      .then(res => res.json())
+    getMessages(limit, skip)
       .then(messages => this.setState({
         loading: false,
         messages: skip > 0 ? this.state.messages.concat(messages) : messages
@@ -45,8 +45,7 @@ class Messages extends Component {
   }
 
   loadStats() {
-    fetch(`/messages/stats`)
-      .then(res => res.json())
+    getStats()
       .then(stats => this.setState({
         stats: stats
       }))
@@ -56,9 +55,13 @@ class Messages extends Component {
       }))
   }
 
-  componentWillMount() {
+  refresh() {
     this.loadMessages()
     this.loadStats()
+  }
+
+  componentWillMount() {
+    this.refresh()
   }
 
   render() {
@@ -76,7 +79,7 @@ class Messages extends Component {
               color='blue'
               basic
               style={{float: 'right'}}
-              onClick={() => this.loadMessages()}
+              onClick={() => this.refresh()}
             />
             <Stats {...this.state.stats} />
           </Container>

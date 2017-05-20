@@ -9,7 +9,7 @@ import { Container } from 'semantic-ui-react'
 import Nav from './components/Nav';
 
 import Messages from './containers/Messages';
-import About from './containers/About';
+import Login from './containers/Login';
 
 import './App.css';
 
@@ -21,6 +21,7 @@ class App extends Component {
           {/* <Nav /> */}
 
           <Route exact path="/" component={Messages} />
+          <Route exact path="/login" component={Login} />
         </Container>
       </Router>
     );

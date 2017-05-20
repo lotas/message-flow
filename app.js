@@ -5,6 +5,7 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const lessMiddleware = require('less-middleware');
+const cors = require('cors');
 
 const index = require('./routes/index');
 const slack = require('./routes/slack');
@@ -27,7 +28,7 @@ app.use(express.static(path.join(__dirname, 'build')));
 
 app.use('/', index);
 app.use('/slack', slack);
-app.use('/messages', messages);
+app.use('/messages', cors(), messages);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

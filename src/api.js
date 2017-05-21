@@ -6,6 +6,7 @@ const commonFetchOptions = {
 
 const checkStatus = (res) => {
     if (res.status === 401) {
+        window.location.href = '/login';
         throw new Error('Login required');
     } else if (res.status === 403) {
         throw new Error('Authorization fail');

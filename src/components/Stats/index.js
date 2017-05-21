@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Statistic } from 'semantic-ui-react'
 
 const Stats = (props) => (
@@ -13,5 +14,10 @@ const Stats = (props) => (
       </Statistic>
     </Statistic.Group>
 );
+
+Stats.propTypes = {
+  total: PropTypes.number,
+  today: PropTypes.number
+};
 
 export default Stats;

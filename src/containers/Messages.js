@@ -1,71 +1,22 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Dimmer, Loader,  Segment, Container, Button, Rail } from 'semantic-ui-react'
 
 import MessageList from '../components/MessageList';
 import Stats from '../components/Stats';
 import {getMessages, getStats} from '../api';
 
-const DEFAULT_PAGE_SIZE = 50;
 
-const emptyMessage = {
-  _id: +new Date(),
-  username: 'John Doe',
-  text: 'lorem ipsum dolr sit amet...',
-  ts: 1493572963,
-  event_time: 1493572963,
-  team_id: 'Team',
-  channel: 'Channel'
-};
+import { loadMessages, loadNextPage } from '../redux/modules/messages';
 
 class Messages extends Component {
-  state = {
-    loading: true,
-    messages: [],
-    error: false,
-    skip: 0,
-    stats: {}
-  }
-
-  loadMessages(limit=DEFAULT_PAGE_SIZE, skip=0) {
-    this.setState({
-      loading: true,
-      error: false,
-      skip: skip
-    });
-
-    getMessages(limit, skip)
-      .then(messages => this.setState({
-        loading: false,
-        messages: skip > 0 ? this.state.messages.concat(messages) : messages
-      }))
-      .catch(err => this.setState({
-        loading: false,
-        error: err
-      }))
-  }
-
-  loadStats() {
-    getStats()
-      .then(stats => this.setState({
-        stats: stats
-      }))
-      .catch(err => this.setState({
-        loading: false,
-        error: err
-      }))
-  }
-
-  refresh() {
-    this.loadMessages()
-    this.loadStats()
-  }
 
   componentWillMount() {
-    this.refresh()
+    this.props.loadMessages();
   }
 
   render() {
-    const {messages, loading} = this.state;
+    const {messages, loading} = this.props;
 
     return (
       <div>
@@ -81,7 +32,7 @@ class Messages extends Component {
               style={{float: 'right'}}
               onClick={() => this.refresh()}
             />
-            <Stats {...this.state.stats} />
+            <Stats {...this.props.stats} />
           </Container>
 
 
@@ -94,7 +45,7 @@ class Messages extends Component {
               icon='arrow down'
               color='blue'
               basic
-              onClick={() => this.loadMessages(DEFAULT_PAGE_SIZE, this.state.skip + DEFAULT_PAGE_SIZE)}
+              onClick={() => this.props.loadNextPage()}
              />
           </Segment>
         }
@@ -104,4 +55,15 @@ class Messages extends Component {
   }
 }
 
-export default Messages;
+const mapStateToProps = (state) => ({
+  loading: state.messages.loading,
+  messages: state.messages.messages,
+  stats: state.stats
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  loadMessages: () => dispatch(loadMessages()),
+  loadNextPage: () => dispatch(loadNextPage()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Messages);
